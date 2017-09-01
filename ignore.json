@@ -1,0 +1,12 @@
+{
+	"class": [
+		"prev-wrap",
+		"next-wrap",
+		"pictureAreaL",
+		"pictureAreaR",
+		"prev-next"
+	],
+	"extra_js": [
+		"if(document.getElementById(`galleryMainPic`))document.getElementById(`galleryMainPic`).addEventListener(`DOMNodeInserted`, function(){Liner.flushImages();});"
+	]
+}
