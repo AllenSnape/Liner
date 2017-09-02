@@ -484,30 +484,58 @@ var Liner = {
 	 */
 	doIgnoreJSON: function(){
 		var thiz = this;
+		
+		// 读取预设好了的文件
 		chrome.runtime.sendMessage({command: "readfiles"}, function(response) {
 			try{
 				var data = JSON.parse(response.data[thiz.ignoreJSON]);
-				
-				// 改宽度至100px的标签
-				for(var i = 0; i < data["class"].length; i++){
-					var dumps = document.getElementsByClassName(data["class"][i]);
-					for(var j = 0; j < dumps.length; j++){
-						dumps[j].style.width = "100px";
-					}
-				}
-				
-				// 执行额外的js 
-				for(var i = 0; i < data["extra_js"].length; i++){
-					try{
-						window.eval(data["extra_js"][i]);
-					}catch(e){
-						console.log("Liner -- extra_js -- " + e);
-					}
-				}
+				thiz.doingIgnoreJSON(data);
 			}catch(e){
 				console.log("Liner -- "+e);
 			}
 		});
+		
+		// 获取github上最新的预设文件信息
+		$.ajax({
+			url:"https://raw.githubusercontent.com/AllenSnape/Liner/master/ignore.json",
+			type:"get",
+			dataType:"json",
+			success:function(data){
+				try{
+					thiz.doingIgnoreJSON(data);
+				}catch(e){
+					console.log("Liner -- "+e);
+				}
+			},
+			error:function(data){
+				console.log("Liner -- "+e);
+			}
+		});
+	},
+	/**
+	 * doIgnoreJSON主要方法
+	 */
+	doingIgnoreJSON: function(data){
+		try{
+			// 改宽度至100px的标签
+			for(var i = 0; i < data["class"].length; i++){
+				var dumps = document.getElementsByClassName(data["class"][i]);
+				for(var j = 0; j < dumps.length; j++){
+					dumps[j].style.width = "100px";
+				}
+			}
+			
+			// 执行额外的js 
+			for(var i = 0; i < data["extra_js"].length; i++){
+				try{
+					window.eval(data["extra_js"][i]);
+				}catch(e){
+					console.log("Liner -- extra_js -- " + e);
+				}
+			}
+		}catch(e){
+			console.log("Liner -- "+e);
+		}
 	}
 };
 
