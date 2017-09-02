@@ -51,7 +51,7 @@ var Liner = {
 			var style = document.createElement("style");
 			style.setAttribute("type", "text/css");
 			style.innerHTML = 
-				"i{position:relative !important;top:auto !important;left:auto !important;width:auto !important;}"+
+				"#v0_as_readzone i{position:relative !important;top:auto !important;left:auto !important;width:auto !important;}"+
 				
 				"#v0_as_readzone{transition-duration:0.3s;z-index:999997;position:fixed;top:10px;right:10px;height:100px;width:100px;border:2px solid #4b4b4b;border-radius:10px;text-align:center;line-height:100px;background-color:#fff;color:#4b4b4b;font-size:14px;cursor:-webkit-grab;overflow:hidden;opacity:0.5;}"+
 				"#v0_as_readzone *{-webkit-user-select:none;}"+
