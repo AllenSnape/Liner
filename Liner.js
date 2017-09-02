@@ -53,7 +53,7 @@ var Liner = {
 			style.innerHTML = 
 				"#v0_as_readzone i{position:relative !important;top:auto !important;left:auto !important;width:auto !important;}"+
 				
-				"#v0_as_readzone{transition-duration:0.3s;z-index:999997;position:fixed;top:10px;right:10px;height:100px;width:100px;border:2px solid #4b4b4b;border-radius:10px;text-align:center;line-height:100px;background-color:#fff;color:#4b4b4b;font-size:14px;cursor:-webkit-grab;overflow:hidden;opacity:0.5;}"+
+				"#v0_as_readzone{transition-duration:0.3s;z-index:999997;position:fixed;top:70px;right:10px;height:100px;width:100px;border:2px solid #4b4b4b;border-radius:10px;text-align:center;line-height:100px;background-color:#fff;color:#4b4b4b;font-size:14px;cursor:-webkit-grab;overflow:hidden;opacity:0.5;}"+
 				"#v0_as_readzone *{-webkit-user-select:none;}"+
 				"#v0_as_readzone:HOVER{height:210px;opacity:1;box-shadow:5px 5px 10px #888888;}"+
 				"#v0_as_readzone:ACTIVE{cursor:-webkit-grabbing;/*box-shadow:10px 10px 20px #888888;*/}"+
@@ -507,7 +507,7 @@ var Liner = {
 					console.log("Liner -- "+e);
 				}
 			},
-			error:function(data){
+			error:function(e){
 				console.log("Liner -- "+e);
 			}
 		});
@@ -558,6 +558,22 @@ chrome.runtime.sendMessage({command: "readfile", filename: Liner.ignoreJSON}, fu
 var onWindowLoaded = function(){
 	Liner.flushImages();
 	Liner.doIgnoreJSON();
+	
+	// 当窗口大小改变的时候, 重新定位图片读取器, 避免其逃出控制范围
+	window.onresize = function(){
+		var readzone = document.getElementById("v0_as_readzone");
+		var readzoneRect = Liner.getRect(readzone);
+		
+		// 脱离左侧范围
+		if(readzoneRect.right > document.documentElement.clientWidth){
+			readzone.style.left = document.documentElement.clientWidth - (readzoneRect.right - readzoneRect.left) + "px";
+		}
+		
+		// 脱离下部范围
+		if(readzoneRect.bottom > document.documentElement.clientHeight){
+			readzone.style.top = document.documentElement.clientHeight - (readzoneRect.bottom - readzoneRect.top) + "px";
+		}
+	}
 }
 
 if(document.readyState === "complete"){
