@@ -21,7 +21,9 @@
         "24": "icons/icon24.png",
         "32": "icons/icon32.png",
         "48": "icons/icon48.png",
-        "128": "icons/icon128.png"
+        "96": "icons/icon48.png",
+        "128": "icons/icon128.png",
+        "1024": "icons/icon1024.png"
     },
 	"content_scripts": [
 		{
