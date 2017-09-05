@@ -16,7 +16,7 @@ var Liner = {
 	// 优先判断长(width)是否超出可视范围; 如果缩放之后高任然超出可视化范围, 则不进一步缩放
 	oversizeImageOffset: 0.9,
 	// 额外忽略的json文件名称
-	ignoreJSON: "ignore.json",
+	ignoreJSON: "resource/ignore.json",
 	// 各个线的参数
 	lines: {
 		// 对角线默认参数
@@ -53,7 +53,7 @@ var Liner = {
 			style.innerHTML = 
 				"#v0_as_readzone i{position:relative !important;top:auto !important;left:auto !important;width:auto !important;}"+
 				
-				"#v0_as_readzone{transition-duration:0.3s;z-index:999997;position:fixed;top:70px;right:10px;height:100px;width:100px;border:2px solid #4b4b4b;border-radius:10px;text-align:center;line-height:100px;background-color:#fff;color:#4b4b4b;font-size:14px;cursor:-webkit-grab;overflow:hidden;opacity:0.5;}"+
+				"#v0_as_readzone{transition-duration:0.3s;z-index:999997;position:fixed;top:70px;right:10px;height:100px;width:100px;border:2px solid #4b4b4b;border-radius:10px;text-align:center;line-height:100px;background-color:#fff;color:#4b4b4b;font-size:14px;cursor:-webkit-grab;overflow:hidden;opacity:0.5;display:block;}"+
 				"#v0_as_readzone *{-webkit-user-select:none;}"+
 				"#v0_as_readzone:HOVER{height:210px;opacity:1;box-shadow:5px 5px 10px #888888;}"+
 				"#v0_as_readzone:ACTIVE{cursor:-webkit-grabbing;/*box-shadow:10px 10px 20px #888888;*/}"+
@@ -485,19 +485,9 @@ var Liner = {
 	doIgnoreJSON: function(){
 		var thiz = this;
 		
-		// 读取预设好了的文件
-		chrome.runtime.sendMessage({command: "readfiles"}, function(response) {
-			try{
-				var data = JSON.parse(response.data[thiz.ignoreJSON]);
-				thiz.doingIgnoreJSON(data);
-			}catch(e){
-				console.log("Liner -- "+e);
-			}
-		});
-		
 		// 获取github上最新的预设文件信息
 		$.ajax({
-			url:"https://raw.githubusercontent.com/AllenSnape/Liner/master/ignore.json",
+			url:"https://raw.githubusercontent.com/AllenSnape/Liner/master/resource/ignore.json",
 			type:"get",
 			dataType:"json",
 			success:function(data){
@@ -508,7 +498,7 @@ var Liner = {
 				}
 			},
 			error:function(e){
-				console.log("Liner -- "+e);
+				console.log("Liner -- "+JSON.stringify(e));
 			}
 		});
 	},
@@ -544,16 +534,6 @@ var Liner = {
 	console.log("Liner -- 初始化完成!");
 })();
 
-// 测试通信
-chrome.runtime.sendMessage({command: "hello"}, function(response) {
-	console.log("Liner -- "+response.message);
-});
-
-// 读取文件
-chrome.runtime.sendMessage({command: "readfile", filename: Liner.ignoreJSON}, function(response) {
-	console.log("Liner -- "+response.message);
-});
-
 // 初始化操作
 var onWindowLoaded = function(){
 	Liner.flushImages();
@@ -581,3 +561,22 @@ if(document.readyState === "complete"){
 }else{
 	window.onload = onWindowLoaded;
 }
+
+//注入页面消息接收端
+chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+	var json = JSON.parse(msg);
+	// 设置相应对象
+	switch(json.code){
+		// 初始化操作
+		case CODE_INIT:{
+			var readzone = document.getElementById("v0_as_readzone");
+			var laststatus = window.getComputedStyle(readzone).display;
+			if(laststatus == "block")
+				readzone.style.display = "none";
+			else
+				readzone.style.display = "block";
+			sendResponse({result:1, message:"inited!", data:{laststatus:laststatus}});
+		}; break;
+		default : console.error("未知操作");
+	}
+});

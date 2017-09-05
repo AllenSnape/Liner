@@ -1,18 +1,24 @@
 {
 	"name": "Liner",
-	"version": "1.1",
+	"version": "1.2",
 	"minimum_chrome_version": "10.0",
 	"description": "给页面内的图片绘制三等分线、对角线等线条, 有助于分析构图.",
 	"permissions": [
-		"http://*/*",
-		"https://*/*",
-		"file:///*"
+		"<all_urls>",
+		"tabs"
 	],
 	"browser_action": {
-		"default_icon": "icons/icon16.png"
-	},
+		"default_icon": {
+			"16": "icons/icon16.png",
+			"24": "icons/icon24.png",
+			"32": "icons/icon32.png" 
+		},
+		"default_title": "Liner",
+		"default_popup": "html/popup.html"
+    },
 	"icons": { 
 		"16": "icons/icon16.png",
+        "24": "icons/icon24.png",
         "32": "icons/icon32.png",
         "48": "icons/icon48.png",
         "128": "icons/icon128.png"
@@ -27,13 +33,11 @@
 			],
 			"js": [
 				"js/jquery-3.2.1.min.js",
-				"Liner.js"
+				"js/const.js",
+				"js/Liner.js"
 			]
 		}
 	],
-	"background": {
-		"scripts": ["background.js"]
-	},
 	"web_accessible_resources": [
 		"css/*",
 		"js/*"
