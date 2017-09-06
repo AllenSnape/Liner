@@ -1,6 +1,6 @@
 {
 	"name": "Liner",
-	"version": "1.2",
+	"version": "1.2.1",
 	"minimum_chrome_version": "10.0",
 	"description": "给页面内的图片绘制三等分线、对角线等线条, 有助于分析构图.",
 	"permissions": [
