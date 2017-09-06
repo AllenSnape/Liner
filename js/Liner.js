@@ -15,8 +15,8 @@ var Liner = {
 	// 主要是为了留白, 例如当该值为0.9时, 如果图片的长(width)超出了可视化区域的宽度(document.documentElement.clientWidth), 此时图片被缩放之后, 该图片左右留白皆为网页可视化区域的0.05
 	// 优先判断长(width)是否超出可视范围; 如果缩放之后高任然超出可视化范围, 则不进一步缩放
 	oversizeImageOffset: 0.9,
-	// 额外忽略的json文件名称
-	ignoreJSON: "resource/ignore.json",
+	// 默认公共动画持续时长
+	commonAnimationDuration: "0.3s",
 	// 各个线的参数
 	lines: {
 		// 对角线默认参数
@@ -53,7 +53,7 @@ var Liner = {
 			style.innerHTML = 
 				"#v0_as_readzone i{position:relative !important;top:auto !important;left:auto !important;width:auto !important;}"+
 				
-				"#v0_as_readzone{transition-duration:0.3s;z-index:999997;position:fixed;top:70px;right:10px;height:100px;width:100px;border:2px solid #4b4b4b;border-radius:10px;text-align:center;line-height:100px;background-color:#fff;color:#4b4b4b;font-size:14px;cursor:-webkit-grab;overflow:hidden;opacity:0.5;display:block;}"+
+				"#v0_as_readzone{transition-duration:"+this.commonAnimationDuration+";z-index:999997;position:fixed;top:70px;right:10px;height:100px;width:100px;border:2px solid #4b4b4b;border-radius:10px;text-align:center;line-height:100px;background-color:#fff;color:#4b4b4b;font-size:14px;cursor:-webkit-grab;overflow:hidden;opacity:0.5;display:block;}"+
 				"#v0_as_readzone *{-webkit-user-select:none;}"+
 				"#v0_as_readzone:HOVER{height:210px;opacity:1;box-shadow:5px 5px 10px #888888;}"+
 				"#v0_as_readzone:ACTIVE{cursor:-webkit-grabbing;/*box-shadow:10px 10px 20px #888888;*/}"+
@@ -61,7 +61,7 @@ var Liner = {
 				"#v0_as_readzone_reader{position:absolute;top:0px;left:0px;width:100%;height:100%;}"+
 				
 				"#v0_as_readzone_hiddenzone{position:absolute;left:0px;display:inline-block;width:80px;margin:100px 10px 0px 10px;}"+
-				"#v0_as_readzone_hiddenzone_refreshImgsBtn{transition-duration:0.3s;width:78px;height:30px;border:1px solid #929292;color:#929292;border-radius:4px;line-height:30px;font-size:14px;}"+
+				"#v0_as_readzone_hiddenzone_refreshImgsBtn{transition-duration:"+this.commonAnimationDuration+";width:78px;height:30px;border:1px solid #929292;color:#929292;border-radius:4px;line-height:30px;font-size:14px;}"+
 				"#v0_as_readzone_hiddenzone_refreshImgsBtn:HOVER{color:#4b4b4b;border-color:#4b4b4b;box-shadow:2px 2px 4px #888888;}"+
 				"#v0_as_readzone_hiddenzone_refreshImgsBtn:ACTIVE{color:#202020;border-color:#202020;box-shadow:1px 1px 2px #888888;}"+
 				"#v0_as_readzone_hiddenzone_linesController{margin:10px 0px 0px 0px;width:80px;list-style:none;padding:0px;}"+
@@ -76,9 +76,12 @@ var Liner = {
 				"#v0_as_readzone_hiddenzone_linesController > li > input[type=color] + div[role=colorDisplay]{display:inline-block;width:8px;height:8px;background-color:#000;border:1px solid #000;cursor:pointer;}"+
 				
 				"#v0_as_shadow{position:fixed;top:0px;left:0px;width:100%;height:100%;background-color:rgba(0,0,0,0.5);display:none;z-index:999998;}"+
+				"@-webkit-keyframes v0_as_shadow_hideAnimation{from{}to{opacity:0;}}"+
+				"@-webkit-keyframes v0_as_shadow_showAnimation{from{}to{opacity:1;}}"+
 				
-				"#v0_as_box{position:fixed;background-repeat:no-repeat;background-attachment:fixed;background-position:center;cursor:-webkit-grab;transition-duration:0.3s;display:none;z-index:999999;}"+
-				"#v0_as_box:ACTIVE{cursor:-webkit-grabbing;}";
+				"#v0_as_box{position:fixed;background-repeat:no-repeat;background-attachment:fixed;background-position:center;cursor:-webkit-grab;transition-duration:"+this.commonAnimationDuration+";display:none;z-index:999999;}"+
+				"#v0_as_box:ACTIVE{cursor:-webkit-grabbing;}"+
+				"@-webkit-keyframes v0_as_box_hideAnimation{from{}to{transform:scale(0);}}";
 			
 			// 可拖拽图片读取区
 			var readzone = document.createElement("div");
@@ -168,7 +171,7 @@ var Liner = {
 				readzoneText.innerText = thiz.readzoneInitWords;
 			};
 			
-			this.readzone = this.draggable(readzone, readzone, true, function(){document.getElementById("v0_as_readzone").style.transitionDuration = "0.3s";});
+			this.readzone = this.draggable(readzone, readzone, true, function(){document.getElementById("v0_as_readzone").style.transitionDuration = thiz.commonAnimationDuration;});
 		}
 	},
 	
@@ -176,20 +179,38 @@ var Liner = {
 	 * 显示控件
 	 */
 	show: function(){
-		document.getElementById("v0_as_shadow").style.display = "block";
-		document.getElementById("v0_as_box").style.display = "block";
-		
 		document.body.addEventListener("mousewheel", this.documentScroll);
+
+		var shadow = document.getElementById("v0_as_shadow");
+		shadow.style.display = "block";
+		shadow.style.opacity = "0";
+		shadow.style.animation = "v0_as_shadow_showAnimation "+this.commonAnimationDuration+" forwards";
+		
+		var box = document.getElementById("v0_as_box");
+		box.style.animation = "";
+		box.style.transitionDuration = this.commonAnimationDuration;
+		box.style.transform = "scale(0)";
+		box.style.display = "block";
 	},
 	
 	/**
 	 * 隐藏控件
 	 */
 	hide: function(){
-		document.getElementById("v0_as_shadow").style.display = "none";
-		document.getElementById("v0_as_box").style.display = "none";
-		
 		document.body.removeEventListener("mousewheel", this.documentScroll);
+		
+		document.getElementById("v0_as_shadow").style.animation = "v0_as_shadow_hideAnimation "+this.commonAnimationDuration+" forwards";
+		document.getElementById("v0_as_box").style.animation = "v0_as_box_hideAnimation "+this.commonAnimationDuration+" forwards";
+		
+		var parsedTime = 300;
+		switch(this.commonAnimationDuration.toString().replace(/[^a-zA-Z]/gi, "")){
+			case "s": parsedTime = this.commonAnimationDuration.toString().replace(/[^\d\.]/gi, "") * 1000;break;
+			case "ms": parsedTime = this.commonAnimationDuration.toString().replace(/[^\d\.]/gi, "") * 1;break;
+		}
+		setTimeout(function(){
+			document.getElementById("v0_as_shadow").style.display = "none";
+			document.getElementById("v0_as_box").style.display = "none";
+		}, parsedTime);
 	},
 	
 	/**
@@ -339,7 +360,7 @@ var Liner = {
 		}
 		
 		// 绑定拖拽事件
-		this.draggable(box, box, false, function(){document.getElementById("v0_as_box").style.transitionDuration = "0.3s";});
+		this.draggable(box, box, false, function(){document.getElementById("v0_as_box").style.transitionDuration = thiz.commonAnimationDuration;});
 	},
 
 	/**
